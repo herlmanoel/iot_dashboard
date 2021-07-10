@@ -15,7 +15,7 @@ let configGraficoTemperatura = {
         responsive: true,
         title: {
             display: true,
-            text: 'Chart.js and Thingspeak ChartTemperature [°C]'
+            text: 'Temperatura [°C]'
         },
         tooltips: {
             mode: 'index',
@@ -56,7 +56,7 @@ let configGraficoControllerTemperature = {
     data: {
         labels: [],
         datasets: [{
-            label: 'Temperatura',
+            label: 'Controller temperature [C]',
             data: [],
             borderWidth: 3,
             borderColor: '#0c4af4',
@@ -108,7 +108,7 @@ let configGraficoControllerAirPressure = {
     data: {
         labels: [],
         datasets: [{
-            label: 'Temperatura',
+            label: 'Air pressure 300m a.s.l. [hPa]',
             data: [],
             borderWidth: 3,
             borderColor: '#0c4af4',
