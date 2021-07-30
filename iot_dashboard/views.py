@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import json
 import csv
+# import json
 from prophet import Prophet
 
 # Create your views here.
@@ -21,6 +22,23 @@ def getData(request):
     tratandoOsDados(channelId, '1', numResults)
     tratandoOsDados(channelId, '2', numResults)
     return HttpResponse({'status': 'ok'})
+
+def getJsonComum():
+    channelId = '196384'
+    numResults = '500'
+    fieldNumber = '1'
+    arrayComplet = returnDataDsYDataFrameMediaDesvio(channelId, fieldNumber, numResults)
+    df = arrayComplet[0]
+    media = arrayComplet[1]
+    desvio = arrayComplet[2]
+    print(df)
+    result = df.to_json(orient="values")
+    parsed = json.loads(result)
+    jsonCompleto = json.dumps(parsed, indent=4)
+    
+
+    return HttpResponse(jsonCompleto)
+
 
 
 # def getTemperaturePrevision(request):
@@ -44,13 +62,24 @@ def getJsonPrev(request):
 
 
 def getDataJsonThingspeak(channelId, fieldNumber, numResults):
-    URL = 'https://api.thingspeak.com/channels/'+channelId + \
-        '/fields/'+fieldNumber+'.json?results='+numResults
+    URL = 'https://api.thingspeak.com/channels/'+channelId +'/fields/'+fieldNumber+'.json?results='+numResults
     print(URL)
     response = requests.get(url=URL)
     feedsJson = response.json()["feeds"]
     return feedsJson
 
+def returnDataDsYDataFrameMediaDesvio(channelId, fieldNumber, numResults):
+    jsonData = getDataJsonThingspeak(channelId, fieldNumber, numResults)
+    df = pd.json_normalize(jsonData)
+    df.drop('entry_id', axis=1, inplace=True)
+    df['created_at'] = pd.to_datetime(
+        df['created_at'], format="%Y-%m-%d %H:%M")
+    df['created_at'] = df['created_at'].dt.tz_convert(None)
+    df.rename(columns={'created_at': 'ds', 'field' + fieldNumber: 'y'}, inplace=True)
+    media = df['y'].mean()
+    desvioPadrao = df['y'].std()
+    array = [df, media, desvioPadrao]
+    return array
 
 def tratandoOsDados(channelId, fieldNumber, numResults):
     jsonData = getDataJsonThingspeak(channelId, fieldNumber, numResults)

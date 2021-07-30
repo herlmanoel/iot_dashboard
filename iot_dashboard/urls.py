@@ -9,5 +9,6 @@ urlpatterns = [
     path("getData/", views.getData, name="getData"),
     path("getJson/", views.getJson, name="getJson"),
     path("getJsonPrev/", views.getJsonPrev, name="getJsonPrev"),
+    path('getJsonComum/', views.getJsonComum, name="getJsonComum"),
 ]
 
