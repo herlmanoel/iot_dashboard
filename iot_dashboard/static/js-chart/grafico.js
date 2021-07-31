@@ -3,19 +3,19 @@ function createElementChart(idElement) {
   let divNova = document.createElement("div");
   divNova.setAttribute("id", idElement);
   let main = document.getElementById("main-cards");
-  main.appendChild(divNova); 
+  main.appendChild(divNova);
 }
 
 function createGraph(fieldNumber, title, nameLine, prev) {
   let idElement;
   let URL;
-  if(prev) {
+  if (prev) {
     URL = `http://127.0.0.1:8000/getJson/?id=${fieldNumber}&prev=1`;
     idElement = `chart_prev_${fieldNumber}`;
   } else {
     URL = `http://127.0.0.1:8000/getJson/?id=${fieldNumber}`;
     idElement = `chart_${fieldNumber}`;
-  } 
+  }
   createElementChart(idElement);
   let dataTable = [];
   let dataJson = [];
@@ -96,7 +96,8 @@ function createGraph(fieldNumber, title, nameLine, prev) {
     yaxis: {
       labels: {
         formatter: function (value) {
-          return value;
+          let v = parseFloat(value)
+          return v.toFixed(2);
         }
       },
     },
@@ -105,19 +106,32 @@ function createGraph(fieldNumber, title, nameLine, prev) {
   chart.render();
 }
 
-
-
-// createElementChart('chart112');
-
-window.onload = function () {
+function renderizarGraficos() {
   createGraph(`1`, 'Outdoor Temperature (DS18B20)', 'Temperature [C]', false);
   createGraph(`2`, 'Temperature (Si7021)', 'Temperature [C]', false);
   createGraph(`3`, 'Air Pressure (BMP280)', 'Pressure [mmHg]', false);
   createGraph(`4`, 'Humidity (Si7021)', 'Humidity [%]', false);
   createGraph(`1`, 'Prevision - Outdoor Temperature (DS18B20)', 'Temperature [C]', true);
   createGraph(`2`, 'Prevision - Temperature (Si7021)', 'Temperature [C]', true);
-  
+}
+
+// createElementChart('chart112');
+
+window.onload = function () {
+
+  renderizarGraficos();
+
+  let timeOut = setInterval(function () {
+    fetch(`http://127.0.0.1:8000/getData`)
+      .then(function (response) {
+        console.log(response.json());
+        renderizarGraficos();
+      }).catch(function (err) {
+        console.log(err)
+      });
+  }, 300000);
+
   // let chart02 = createGraph('2', 'chart112', 'Titulo', 'Temperatura');
-  
+
   // chart02.render();
 }
